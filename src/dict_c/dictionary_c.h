@@ -19,7 +19,14 @@ struct SInGeDict {
     const size_t length;
 };
 
-SInGe SInGeInit(size_t kMaxDict, size_t kMinLen, char kStopSymbol, size_t kMaxAutomatonSize, double kAutomatonCoef);
+SInGe SInGeInit(
+    size_t maxDict,
+    size_t minLen,
+    char stopSymbol,
+    size_t maxAutomatonSize,
+    double automatonCoef,
+    size_t minDocsOccursIn
+);
 
 void SInGeFree(SInGe gen);
 

@@ -27,7 +27,7 @@ TEST(DictionaryTest, AddMethodTest) {
   dict_string.AddDocumentViaStopSymbol(s2);
   dict_string.BuildDict();
 
-  auto singe = SInGeInit(100, 3, '#', 1000, 1.0);
+  auto singe = SInGeInit(100, 3, '#', 1000, 1.0, 2);
   SInGeAddDocument(singe, s1.c_str(), s1.length());
   SInGeAddDocumentViaStopSymbol(singe, s2.c_str(), s2.length());
   auto dataC = SInGeGetDict(singe);
@@ -43,7 +43,7 @@ TEST(DictionaryTest, MainDictionaryTest) {
   std::string s2 = "qwecabarty";
   std::string s3 = "caba_cabaqwe";
 
-  auto singe = SInGeInit(100, 3, '#', 1000, 1.0);
+  auto singe = SInGeInit(100, 3, '#', 1000, 1.0, 2);
   for (auto s : std::vector<std::string>{s1, s2, s3}) {
     SInGeAddDocumentViaStopSymbol(singe, s.c_str(), s.length());
   }

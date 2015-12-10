@@ -29,4 +29,9 @@ target_link_libraries(dict_c_tests
 
 add_test(NAME dict_c_tests COMMAND dict_c_tests)
 
+add_custom_target(install_dictgen_c
+        make install
+        DEPENDS dictgen_c
+        COMMENT "Installing dictgen_c"
+)
 

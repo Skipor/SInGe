@@ -18,9 +18,23 @@ namespace {
 
 extern "C" {
 
-SInGe SInGeInit(size_t kMaxDict, size_t kMinLen, char kStopSymbol, size_t kMaxAutomatonSize, double kAutomatonCoef) {
+SInGe SInGeInit(
+    size_t maxDict,
+    size_t minLen,
+    char stopSymbol,
+    size_t maxAutomatonSize,
+    double automatonCoef,
+    size_t minDocsOccursIn
+) {
 //  Log() << "Init";
-  return static_cast<SInGe> (new Dictionary(kMaxDict, kMinLen, kStopSymbol, kMaxAutomatonSize, kAutomatonCoef));
+  return static_cast<SInGe> (new Dictionary(
+      maxDict,
+      minLen,
+      stopSymbol,
+      maxAutomatonSize,
+      automatonCoef,
+      minDocsOccursIn
+  ));
 };
 
 void SInGeFree(SInGe gen) {
