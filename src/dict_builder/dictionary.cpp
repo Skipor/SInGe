@@ -32,16 +32,22 @@ namespace {
   }	
 };
 
-Dictionary::Dictionary() : kMaxDict((1 << 18) + 10), kMinLen(20), kMinDocsOccursIn(1) {}
+
+Dictionary::Dictionary(size_t maxDict, size_t minLen, size_t minDocsOccursIn)
+    : kMaxDict(maxDict), kMinLen(minLen), kMinDocsOccursIn(minDocsOccursIn) {
+};
+
+Dictionary::Dictionary() : Dictionary( (1 << 18) + 10, 20, 1) {}
 
 Dictionary::Dictionary(size_t kMaxDict
       , size_t kMinLen
       , char kStopSymbol
       , size_t kMaxAutomatonSize
-      , double kAutomatonCoef)
+      , double kAutomatonCoef
+      , size_t kMinDocsOccursIn)
     : kMaxDict(kMaxDict)
     , kMinLen(kMinLen)
-    , kMinDocsOccursIn(2)
+    , kMinDocsOccursIn(kMinDocsOccursIn)
     , automaton_all_(
         SuffixAutomaton(kStopSymbol, kMaxAutomatonSize, kAutomatonCoef)) {
 }

@@ -18,7 +18,9 @@ public:
 
   Dictionary();
 
-  Dictionary(size_t kMaxDict, size_t kMinLen, char kStopSymbol, size_t kMaxAutomatonSize, double kAutomatonCoef);
+  Dictionary(size_t maxDict, size_t minLen, size_t minDocsOccursIn = 2);
+    
+  Dictionary(size_t kMaxDict, size_t kMinLen, char kStopSymbol, size_t kMaxAutomatonSize, double kAutomatonCoef, size_t kMinDocsOccursIn = 2);
 
   Dictionary(size_t kMaxDict, size_t kMinLen, SuffixAutomaton& automaton);
 
