@@ -6,4 +6,4 @@ add_custom_target(build_golang_singe
         SOURCES singe.go
 )
 
-add_test(golang_singe_tests COMMAND go fmt && go test ${CMAKE_CURRENT_SOURCE_DIR})
+#add_test(golang_singe_tests COMMAND go test ${CMAKE_CURRENT_SOURCE_DIR}) #todo
