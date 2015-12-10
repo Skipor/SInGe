@@ -44,7 +44,9 @@ SuffixAutomaton::SuffixAutomaton(char kStopSymbol, size_t kMaxSize, double kCoef
   AddToNodesToDelete(last_node_);
 }
 
-SuffixAutomaton::~SuffixAutomaton() { std::cerr << "kMaxSize=" << kMaxSize << " kCoef=" << kCoef << std::endl; }
+SuffixAutomaton::~SuffixAutomaton() {
+//  std::cerr << "kMaxSize=" << kMaxSize << " kCoef=" << kCoef << std::endl;
+}
 
 SuffixAutomaton::iterator SuffixAutomaton::begin() {
   return SuffixAutomaton::iterator(1, is_free_node_);
