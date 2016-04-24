@@ -22,14 +22,14 @@ using std::cout;
 using std::endl;
 using std::cerr;
 
-void parse_args(int argc, char ** argv) {
-  if  (argc < 3) {
+void parse_args(int argc, char **argv) {
+  if (argc < 3) {
     cout << "two arguments are needed: dir_files_to_add and dir_dict" << endl;
     return;
   }
 
-  vector <string> paths;
-  const char * dir_files = argv[1];
+  vector<string> paths;
+  const char *dir_files = argv[1];
   DIR *dirp = opendir(dir_files);
   struct dirent *dp;
   while ((dp = readdir(dirp)) != NULL) {
@@ -37,15 +37,15 @@ void parse_args(int argc, char ** argv) {
     string path = std::string(dir_files) + "/" + dp->d_name;
     if (0 == stat(path.c_str(), &st)) {
       if (S_ISREG(st.st_mode)) {
-        paths.push_back(path);			
+        paths.push_back(path);
       }
     }
   }
-  
+
   cerr << "building dictionary..." << endl;
 
   Dictionary dictionary;
-  for (const auto& path : paths) {
+  for (const auto &path : paths) {
     std::ifstream file(path);
     string content;
     std::copy(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>(), std::back_inserter(content));
@@ -54,14 +54,14 @@ void parse_args(int argc, char ** argv) {
   }
 
   dictionary.BuildDict();
-  
-  const char * dir_dict = argv[2];
+
+  const char *dir_dict = argv[2];
   dictionary.OutputDictTo(string(dir_dict));
 
   cout << "ready in " << ((double) clock() / CLOCKS_PER_SEC) << '\n';
 }
 
-int main(int argc, char ** argv) {
+int main(int argc, char **argv) {
   parse_args(argc, argv);
   return 0;
 }

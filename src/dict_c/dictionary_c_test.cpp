@@ -8,12 +8,12 @@
 using namespace std;
 
 namespace {
-  typedef unique_ptr<SInGe> SInGePtr;
-  constexpr size_t kMaxDict = 2 << 17;
-  constexpr size_t kMinLen  = 3;
-  constexpr char kStopSymbol  = '#';
-  constexpr size_t kMaxAutomatonSize =  2 << 17;
-  constexpr double kAutomatonCoef = 1.0;
+typedef unique_ptr<SInGe> SInGePtr;
+constexpr size_t kMaxDict = 2 << 17;
+constexpr size_t kMinLen = 3;
+constexpr char kStopSymbol = '#';
+constexpr size_t kMaxAutomatonSize = 2 << 17;
+constexpr double kAutomatonCoef = 1.0;
 
 }
 
@@ -51,7 +51,7 @@ TEST(DictionaryTest, MainDictionaryTest) {
 //  SInGeAddDocumentViaStopSymbol(singe, s2.c_str(), s2.length());
 //  SInGeAddDocumentViaStopSymbol(singe, s3.c_str(), s3.length());
 
-  Dictionary & dict = *(static_cast<Dictionary*>(singe));
+  Dictionary &dict = *(static_cast<Dictionary *>(singe));
   auto dataC = SInGeGetDict(singe);
   auto dataCPP = dict.GetDict();
 

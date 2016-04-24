@@ -10,7 +10,7 @@
 #include "suffix_automaton.hpp"
 
 class Dictionary {
-public:
+ public:
   // const in the past
   size_t kMaxDict;
   size_t kMinLen;
@@ -19,51 +19,56 @@ public:
   Dictionary();
 
   Dictionary(size_t maxDict, size_t minLen, size_t minDocsOccursIn = 2);
-    
-  Dictionary(size_t kMaxDict, size_t kMinLen, char kStopSymbol, size_t kMaxAutomatonSize, double kAutomatonCoef, size_t kMinDocsOccursIn = 2);
 
-  Dictionary(size_t kMaxDict, size_t kMinLen, SuffixAutomaton& automaton);
+  Dictionary(size_t kMaxDict,
+             size_t kMinLen,
+             char kStopSymbol,
+             size_t kMaxAutomatonSize,
+             double kAutomatonCoef,
+             size_t kMinDocsOccursIn = 2);
+
+  Dictionary(size_t kMaxDict, size_t kMinLen, SuffixAutomaton &automaton);
 
   ~Dictionary();
 
-  void AddDocument(std::string& doc);
+  void AddDocument(std::string &doc);
 
-  void AddDocument(const char* doc, size_t length);
+  void AddDocument(const char *doc, size_t length);
 
-  void AddDocumentViaStopSymbol(std::string& doc);
+  void AddDocumentViaStopSymbol(std::string &doc);
 
-  void AddDocumentViaStopSymbol(const char* doc, size_t length);
-    
+  void AddDocumentViaStopSymbol(const char *doc, size_t length);
+
   void BuildDict();
 
   std::vector<std::pair<std::string, size_t> > GetDictSubstringsList();
 
   std::string GetDict();
 
-  SuffixAutomaton& GetAutomaton();
+  SuffixAutomaton &GetAutomaton();
 
   void OutputDictTo(std::string path);
 
   void ResetLastDocument();
 
-private:
-  void CollectGoodSubstrings(std::vector<size_t>* substrings);
+ private:
+  void CollectGoodSubstrings(std::vector<size_t> *substrings);
 
-  bool CanAffordSubstringFrom(Node* node) const;
+  bool CanAffordSubstringFrom(Node *node) const;
 
-  inline const Node* GetNode(size_t id) const {
+  inline const Node *GetNode(size_t id) const {
     return automaton_all_.GetNode(id);
   }
 
-  inline Node* GetNode(size_t id) {
+  inline Node *GetNode(size_t id) {
     return automaton_all_.GetNode(id);
   }
 
-  inline size_t GetIdNode(Node* node) const {
+  inline size_t GetIdNode(Node *node) const {
     return automaton_all_.GetIdNode(node);
   }
 
-  inline size_t GetIdNode(Node* node) {
+  inline size_t GetIdNode(Node *node) {
     return automaton_all_.GetIdNode(node);
   }
 

@@ -21,15 +21,15 @@ using std::string;
 using std::vector;
 
 namespace {
-  const double kEps = 1e-10;
+const double kEps = 1e-10;
 
-  inline bool DoubleEquals(double first, double second) {
-    return fabs(first - second) < kEps;	
-  }
+inline bool DoubleEquals(double first, double second) {
+  return fabs(first - second) < kEps;
+}
 
-  inline bool DoubleLess(double first, double second) {
-    return first < second && !DoubleEquals(first, second);
-  }	
+inline bool DoubleLess(double first, double second) {
+  return first < second && !DoubleEquals(first, second);
+}
 };
 
 
@@ -37,44 +37,36 @@ Dictionary::Dictionary(size_t maxDict, size_t minLen, size_t minDocsOccursIn)
     : kMaxDict(maxDict), kMinLen(minLen), kMinDocsOccursIn(minDocsOccursIn) {
 };
 
-Dictionary::Dictionary() : Dictionary( (1 << 18) + 10, 20, 1) {}
+Dictionary::Dictionary() : Dictionary((1 << 18) + 10, 20, 1) { }
 
-Dictionary::Dictionary(size_t kMaxDict
-      , size_t kMinLen
-      , char kStopSymbol
-      , size_t kMaxAutomatonSize
-      , double kAutomatonCoef
-      , size_t kMinDocsOccursIn)
-    : kMaxDict(kMaxDict)
-    , kMinLen(kMinLen)
-    , kMinDocsOccursIn(kMinDocsOccursIn)
-    , automaton_all_(
-        SuffixAutomaton(kStopSymbol, kMaxAutomatonSize, kAutomatonCoef)) {
+Dictionary::Dictionary(size_t kMaxDict,
+                       size_t kMinLen,
+                       char kStopSymbol,
+                       size_t kMaxAutomatonSize,
+                       double kAutomatonCoef,
+                       size_t kMinDocsOccursIn)
+    : kMaxDict(kMaxDict), kMinLen(kMinLen), kMinDocsOccursIn(kMinDocsOccursIn), automaton_all_(
+    SuffixAutomaton(kStopSymbol, kMaxAutomatonSize, kAutomatonCoef)) {
 }
 
-Dictionary::Dictionary(size_t kMaxDict
-      , size_t kMinLen
-      , SuffixAutomaton& automaton)
-    : kMaxDict(kMaxDict)
-    , kMinLen(kMinLen)
-    , kMinDocsOccursIn(2)
-    , automaton_all_(automaton) {
+Dictionary::Dictionary(size_t kMaxDict, size_t kMinLen, SuffixAutomaton &automaton)
+    : kMaxDict(kMaxDict), kMinLen(kMinLen), kMinDocsOccursIn(2), automaton_all_(automaton) {
 }
 
-Dictionary::~Dictionary() {}
+Dictionary::~Dictionary() { }
 
-void Dictionary::AddDocument(string& doc) {
+void Dictionary::AddDocument(string &doc) {
   last_document_ += doc;
   automaton_all_.AddString(doc.data(), doc.size());
 }
 
-void Dictionary::AddDocument(const char* doc, size_t length) {
-  last_document_ += string(doc, length);   
+void Dictionary::AddDocument(const char *doc, size_t length) {
+  last_document_ += string(doc, length);
   automaton_all_.AddString(doc, length);
 }
 
-void Dictionary::AddDocumentViaStopSymbol(string& doc) {
-  if  (automaton_all_.Empty()) {
+void Dictionary::AddDocumentViaStopSymbol(string &doc) {
+  if (automaton_all_.Empty()) {
     AddDocument(doc);
     return;
   }
@@ -85,8 +77,8 @@ void Dictionary::AddDocumentViaStopSymbol(string& doc) {
   automaton_all_.AddStringViaStopSymbol(doc.data(), doc.size());
 }
 
-void Dictionary::AddDocumentViaStopSymbol(const char* doc, size_t length) {
-  if  (automaton_all_.Empty()) {
+void Dictionary::AddDocumentViaStopSymbol(const char *doc, size_t length) {
+  if (automaton_all_.Empty()) {
     AddDocument(doc, length);
     return;
   }
@@ -98,22 +90,24 @@ void Dictionary::AddDocumentViaStopSymbol(const char* doc, size_t length) {
 }
 
 void Dictionary::BuildDict() {
-  if  (automaton_all_.Empty()) {
+  if (automaton_all_.Empty()) {
     return;
   }
 
   ResetLastDocument();
   dict_.clear();
 
-  vector<size_t> substrings; 
+  vector<size_t> substrings;
   CollectGoodSubstrings(&substrings);
 
-  sort(substrings.begin(), substrings.end(), [&] (int id1, int id2) { return DoubleLess(automaton_all_.GetScore(id2), automaton_all_.GetScore(id1)); });
+  sort(substrings.begin(),
+       substrings.end(),
+       [&](int id1, int id2) { return DoubleLess(automaton_all_.GetScore(id2), automaton_all_.GetScore(id1)); });
 
   size_t length_dict = 0;
   for (size_t i = 0; i < substrings.size() && length_dict + kMinLen <= kMaxDict; ++i) {
-    auto* node = GetNode(substrings[i]);
-    if  (length_dict + node->len_within_document > kMaxDict) {
+    auto *node = GetNode(substrings[i]);
+    if (length_dict + node->len_within_document > kMaxDict) {
       continue;
     }
     length_dict += node->len_within_document;
@@ -125,9 +119,9 @@ vector<pair<string, size_t> > Dictionary::GetDictSubstringsList() {
   vector<pair<string, size_t> > substrings;
   substrings.reserve(dict_.size());
   for (int id : dict_) {
-    Node* node = GetNode(id);
+    Node *node = GetNode(id);
     string str = automaton_all_.GetLongestString(id);
-    substrings.push_back(make_pair(str, node->docs_occurs_in));	
+    substrings.push_back(make_pair(str, node->docs_occurs_in));
   }
   return substrings;
 }
@@ -135,12 +129,12 @@ vector<pair<string, size_t> > Dictionary::GetDictSubstringsList() {
 string Dictionary::GetDict() {
   string dict_str;
   for (size_t id : dict_) {
-  	dict_str += automaton_all_.GetLongestString(id);
+    dict_str += automaton_all_.GetLongestString(id);
   }
   return dict_str;
 }
 
-SuffixAutomaton& Dictionary::GetAutomaton() {
+SuffixAutomaton &Dictionary::GetAutomaton() {
   return automaton_all_;
 }
 
@@ -150,32 +144,32 @@ void Dictionary::OutputDictTo(string path) {
 }
 
 void Dictionary::ResetLastDocument() {
-  if  (last_document_.empty()) {
+  if (last_document_.empty()) {
     return;
   }
 
 //  cerr << "calculate occurences for document with length " << last_document_.size() << endl;
 
-	size_t cur_hash = (rand() << 16) ^ rand();
+  size_t cur_hash = (rand() << 16) ^rand();
   size_t id = automaton_all_.root();
-	size_t pos = 0;
-	while (pos < last_document_.size()) {
-		id = GetNode(id)->NextNodeThrough(last_document_[pos]);
-		++pos;
+  size_t pos = 0;
+  while (pos < last_document_.size()) {
+    id = GetNode(id)->NextNodeThrough(last_document_[pos]);
+    ++pos;
 
-		size_t cur_id = id;
-		while (cur_id && GetNode(cur_id)->last_hash != cur_hash) {
-			GetNode(cur_id)->last_hash = cur_hash;
+    size_t cur_id = id;
+    while (cur_id && GetNode(cur_id)->last_hash != cur_hash) {
+      GetNode(cur_id)->last_hash = cur_hash;
       automaton_all_.AddOccurence(cur_id);
-			cur_id = GetNode(cur_id)->link;
-		}
- 	}
+      cur_id = GetNode(cur_id)->link;
+    }
+  }
 
   last_document_.clear();
   automaton_all_.ReduceSize();
 }
 
-void Dictionary::CollectGoodSubstrings(vector <size_t>* substrings) {
+void Dictionary::CollectGoodSubstrings(vector<size_t> *substrings) {
   size_t nodes = automaton_all_.AmountNodes();
   vector<double> max_score_substring(nodes, -1e20);
   vector<double> max_score_upstring(nodes, -1e20);
@@ -185,9 +179,9 @@ void Dictionary::CollectGoodSubstrings(vector <size_t>* substrings) {
   // calc max_score_substring
   for (size_t id : order) {
     double max_score = -1e20;
-    if  (GetNode(id)->link) {
+    if (GetNode(id)->link) {
       double score = max_score_substring[GetNode(id)->link];
-      if  (DoubleLess(max_score, score)) {
+      if (DoubleLess(max_score, score)) {
         max_score = score;
       }
     }
@@ -195,14 +189,14 @@ void Dictionary::CollectGoodSubstrings(vector <size_t>* substrings) {
     for (auto it = GetNode(id)->rev_edges_begin(); it != GetNode(id)->rev_edges_end(); ++it) {
       size_t from = it->second;
       double score = max_score_substring[from];
-      if  (DoubleLess(max_score, score)) {
+      if (DoubleLess(max_score, score)) {
         max_score = score;
       }
     }
 
-    if  (CanAffordSubstringFrom(GetNode(id))) {
+    if (CanAffordSubstringFrom(GetNode(id))) {
       double our_score = automaton_all_.GetScore(id);
-      if  (DoubleLess(our_score, max_score)) {
+      if (DoubleLess(our_score, max_score)) {
         can_to_dict[id] = false;
       } else {
         max_score = our_score;
@@ -213,7 +207,7 @@ void Dictionary::CollectGoodSubstrings(vector <size_t>* substrings) {
 
     max_score_substring[id] = max_score;
   }
-  
+
   // calc max_score_upstring
   reverse(order.begin(), order.end());
   for (size_t id : order) {
@@ -221,7 +215,7 @@ void Dictionary::CollectGoodSubstrings(vector <size_t>* substrings) {
     for (auto it = GetNode(id)->edges_begin(); it != GetNode(id)->edges_end(); ++it) {
       size_t to = it->second;
       double score = max_score_upstring[to];
-      if  (DoubleLess(max_score, score)) {
+      if (DoubleLess(max_score, score)) {
         max_score = score;
       }
     }
@@ -229,14 +223,14 @@ void Dictionary::CollectGoodSubstrings(vector <size_t>* substrings) {
     for (auto it = GetNode(id)->rev_links_begin(); it != GetNode(id)->rev_links_end(); ++it) {
       size_t to = *it;
       double score = max_score_upstring[to];
-      if  (DoubleLess(max_score, score)) {
+      if (DoubleLess(max_score, score)) {
         max_score = score;
-      }			
+      }
     }
 
-    if  (CanAffordSubstringFrom(GetNode(id))) {
+    if (CanAffordSubstringFrom(GetNode(id))) {
       double our_score = automaton_all_.GetScore(id);
-      if  (!DoubleLess(max_score, our_score)) {
+      if (!DoubleLess(max_score, our_score)) {
         can_to_dict[id] = false;
       } else {
         max_score = our_score;
@@ -250,12 +244,12 @@ void Dictionary::CollectGoodSubstrings(vector <size_t>* substrings) {
 
   // result
   for (size_t id : order) {
-    if  (can_to_dict[id]) {
+    if (can_to_dict[id]) {
       substrings->push_back(id);
     }
   }
 }
 
-bool Dictionary::CanAffordSubstringFrom(Node* node) const {
+bool Dictionary::CanAffordSubstringFrom(Node *node) const {
   return node->len_within_document >= kMinLen && node->docs_occurs_in >= kMinDocsOccursIn;
 }

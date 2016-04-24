@@ -8,7 +8,7 @@
 
 #include "incremental_tester.hpp"
 
-IncrementalTester::IncrementalTester(const char * folder) : folder(folder) {}
+IncrementalTester::IncrementalTester(const char *folder) : folder(folder) { }
 
 void IncrementalTester::Run(size_t documents, size_t dict_margin, bool vs_empty_dict) {
   dictionary = Dictionary();
@@ -17,7 +17,7 @@ void IncrementalTester::Run(size_t documents, size_t dict_margin, bool vs_empty_
   sum_score_vs_empty_dict = 0;
 
   DIR *dirp;
-  if  (!(dirp = opendir(folder))) {
+  if (!(dirp = opendir(folder))) {
     throw std::invalid_argument("failed to open directory");
   }
 
@@ -32,20 +32,21 @@ void IncrementalTester::Run(size_t documents, size_t dict_margin, bool vs_empty_
     }
   }
 
-  if  (seen_files == 0) {
+  if (seen_files == 0) {
     throw std::invalid_argument("provide mode valid files to test");
     return;
   }
 
   std::cout << "average score for " << seen_files << " documents: " << ((double) sum_score / seen_files) << std::endl;
-  if  (vs_empty_dict) {
-    std::cout << "average score versus empty dictionary: " << ((double) sum_score_vs_empty_dict / seen_files) << std::endl;
+  if (vs_empty_dict) {
+    std::cout << "average score versus empty dictionary: " << ((double) sum_score_vs_empty_dict / seen_files)
+        << std::endl;
   }
   std::cout << "building dictionary margin was " << dict_margin << std::endl;
 }
 
-bool IncrementalTester::ProcessFile(const std::string& path, size_t documents, size_t dict_margin, bool vs_empty_dict) {
-  if  (seen_files == documents) {
+bool IncrementalTester::ProcessFile(const std::string &path, size_t documents, size_t dict_margin, bool vs_empty_dict) {
+  if (seen_files == documents) {
     return false;
   }
 
@@ -56,7 +57,7 @@ bool IncrementalTester::ProcessFile(const std::string& path, size_t documents, s
     content += buf;
   }
 
-  if  (content.empty()) {
+  if (content.empty()) {
     return false;
   }
 
@@ -74,20 +75,20 @@ bool IncrementalTester::ProcessFile(const std::string& path, size_t documents, s
   std::cout << "file size: " << content.size() << std::endl;
   std::cout << "score: " << cur_score << std::endl;
 
-  if  (vs_empty_dict) {
+  if (vs_empty_dict) {
     std::string empty_dict;
     open_vcdiff::VCDiffEncoder encoder(empty_dict.data(), empty_dict.size());
     encoder.SetFormatFlags(open_vcdiff::VCD_FORMAT_INTERLEAVED);
     std::string delta_empty;
     encoder.Encode(content.data(), content.size(), &delta_empty);
-    
+
     double score_empty = (double) delta_empty.size() / content.size();
     sum_score_vs_empty_dict += cur_score / score_empty;
     std::cout << "score / (score empty dict): " << cur_score / score_empty << std::endl;
   }
 
   dictionary.AddDocumentViaStopSymbol(content);
-  if  (seen_files % dict_margin == 0) {
+  if (seen_files % dict_margin == 0) {
     dictionary.BuildDict();
   }
 

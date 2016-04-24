@@ -1,3 +1,6 @@
+// Copyright 2014 Vladimir Skipor <vladimirskipor@gmail.com>
+// Released under the MIT license
+
 message ProtoNode {
   message Edge {
    required int32 edge_char = 1;

@@ -2,6 +2,7 @@
 * simple-SDCH-gen
 *
 * Copyright 2014 Pavel Savchenkov <pavelsavchenkow@gmail.com>
+* Copyright 2014 Vladimir Skipor <vladimirskipor@gmail.com>
 * Released under the MIT license
 */
 
@@ -65,11 +66,11 @@ size_t SuffixAutomaton::AmountAliveNodes() const {
 }
 
 double SuffixAutomaton::GetScore(size_t id) {
-  if  (!GetNode(id)) {
+  if (!GetNode(id)) {
     return -1e20;
   }
   size_t len = GetNode(id)->len_within_document;
-  if  (len <= 3) {
+  if (len <= 3) {
     return 0.0;
   } else {
     return ((double) (len - 3) / len) * GetNode(id)->score_occurs_only * current_coef;
@@ -92,14 +93,14 @@ bool SuffixAutomaton::AddOccurence(size_t id) {
   return true;
 }
 
-void SuffixAutomaton::AddString(const char* const str, size_t length) {
+void SuffixAutomaton::AddString(const char *const str, size_t length) {
   for (size_t i = 0; i < length; ++i) {
     AddCharacter(str[i]);
     ++len_up_to_stop_symbol_;
   }
 }
 
-void SuffixAutomaton::AddStringViaStopSymbol(const char* const str, size_t length) {
+void SuffixAutomaton::AddStringViaStopSymbol(const char *const str, size_t length) {
   current_coef *= kCoef;
 
   len_up_to_stop_symbol_ = 0;
@@ -134,7 +135,7 @@ string SuffixAutomaton::GetLongestString(size_t id) {
       size_t cur_id = it->second;
       char cur_ch = it->first;
       size_t cur_len = GetNode(cur_id)->len_within_document;
-      if  (cur_len >= max_len) {
+      if (cur_len >= max_len) {
         max_len = cur_len;
         max_id = cur_id;
         max_ch = cur_ch;
@@ -148,7 +149,7 @@ string SuffixAutomaton::GetLongestString(size_t id) {
 }
 
 bool SuffixAutomaton::ReduceSize() {
-  if  (AmountAliveNodes() > 2 * kMaxSize) { 
+  if (AmountAliveNodes() > 2 * kMaxSize) {
     while (AmountAliveNodes() > kMaxSize)
       DeleteNode(nodes_to_delete_.begin()->second);
 
@@ -161,7 +162,7 @@ vector<size_t> SuffixAutomaton::GetNodesInOrder() {
   std::queue<size_t> q_nodes;
   vector<char> was_in_q(AmountNodes(), false);
   vector<size_t> order;
-  
+
   q_nodes.push(root());
   was_in_q[root()] = true;
   while (!q_nodes.empty()) {
@@ -171,18 +172,18 @@ vector<size_t> SuffixAutomaton::GetNodesInOrder() {
 
     for (auto it = GetNode(id)->edges_begin(); it != GetNode(id)->edges_end(); ++it) {
       size_t to = it->second;
-      if  (!was_in_q[to]) {
+      if (!was_in_q[to]) {
         was_in_q[to] = true;
         q_nodes.push(to);
       }
-    }      
+    }
   }
 
   return order;
 }
 
 size_t SuffixAutomaton::NewNode() {
-  if  (nodes_pool_.empty()) {
+  if (nodes_pool_.empty()) {
     is_free_node_.push_back(false);
     nodes_pool_.push_back(Node());
     return 0;
@@ -190,7 +191,7 @@ size_t SuffixAutomaton::NewNode() {
 
   ++amount_alive_nodes_;
   size_t id = 0;
-  if  (free_nodes_.empty()) {
+  if (free_nodes_.empty()) {
     nodes_pool_.push_back(Node());
     is_free_node_.push_back(false);
     id = nodes_pool_.size() - 1;
@@ -204,11 +205,11 @@ size_t SuffixAutomaton::NewNode() {
 }
 
 bool SuffixAutomaton::AddLink(size_t from, size_t to) {
-  if  (!GetNode(from) || !GetNode(to))
+  if (!GetNode(from) || !GetNode(to))
     return false;
 
   size_t old_to = GetNode(from)->link;
-  if  (GetNode(old_to))
+  if (GetNode(old_to))
     GetNode(old_to)->DeleteRevLink(from);
 
   GetNode(from)->link = to;
@@ -219,7 +220,7 @@ bool SuffixAutomaton::AddLink(size_t from, size_t to) {
 bool SuffixAutomaton::AddEdge(size_t from, size_t to, char ch) {
   GetNode(from)->AddEdge(ch, to);
   GetNode(to)->AddRevEdge(ch, from);
-  if  (GetNode(from)->OutDegree() == 1) {
+  if (GetNode(from)->OutDegree() == 1) {
     EraseFromNodesToDelete(from);
   }
   return true;
@@ -228,14 +229,14 @@ bool SuffixAutomaton::AddEdge(size_t from, size_t to, char ch) {
 bool SuffixAutomaton::DeleteEdge(size_t from, size_t to) {
   GetNode(from)->DeleteEdge(to);
   GetNode(to)->DeleteRevEdge(from);
-  if  (GetNode(from)->OutDegree() == 0) {
+  if (GetNode(from)->OutDegree() == 0) {
     AddToNodesToDelete(from);
   }
-  return true;  
+  return true;
 }
 
 bool SuffixAutomaton::DeleteNode(size_t id) {
-  if  (id == last_node_) {
+  if (id == last_node_) {
     size_t new_last_node_ = 0;
     for (auto it = GetNode(id)->rev_edges_begin(); it != GetNode(id)->rev_edges_end(); ++it) {
       if (!new_last_node_ || GetNode(it->second)->len_actual > GetNode(new_last_node_)->len_actual) {
@@ -249,13 +250,13 @@ bool SuffixAutomaton::DeleteNode(size_t id) {
   for (auto it = GetNode(id)->rev_links_begin(); it != GetNode(id)->rev_links_end(); ++it) {
     size_t from = *it;
     GetNode(from)->link = GetNode(id)->link;
-    GetNode(GetNode(id)->link)->AddRevLink(from);  
+    GetNode(GetNode(id)->link)->AddRevLink(from);
   }
-  
+
   // delete incoming edges
   for (auto it = GetNode(id)->rev_edges_begin(); it != GetNode(id)->rev_edges_end(); ++it) {
     GetNode(it->second)->DeleteEdge(id);
-    if (GetNode(it->second)->OutDegree() == 0) {    
+    if (GetNode(it->second)->OutDegree() == 0) {
       AddToNodesToDelete(it->second);
     }
   }
@@ -298,13 +299,13 @@ void SuffixAutomaton::AddCharacter(char ch) {
     AddEdge(prev, new_node, ch);
   }
 
-  if  (!prev) {
+  if (!prev) {
     AddLink(new_node, root());
     return;
   }
 
   size_t next = GetNode(prev)->NextNodeThrough(ch);
-  if  (GetNode(next)->len_actual == GetNode(prev)->len_actual + 1) {
+  if (GetNode(next)->len_actual == GetNode(prev)->len_actual + 1) {
     AddLink(new_node, next);
     return;
   }
@@ -339,7 +340,7 @@ void SuffixAutomaton::EraseFromNodesToDelete(size_t id) {
       make_pair(make_pair(GetNode(id)->score_occurs_only, GetNode(id)->len_within_document), id));
 }
 
-SuffixAutomaton::iterator::iterator(size_t id, vector<bool>& is_free_node) : id_(id), is_free_node_(is_free_node) {}
+SuffixAutomaton::iterator::iterator(size_t id, vector<bool> &is_free_node) : id_(id), is_free_node_(is_free_node) { }
 
 SuffixAutomaton::iterator SuffixAutomaton::iterator::operator++() {
   iterator prev = *this;
@@ -348,19 +349,19 @@ SuffixAutomaton::iterator SuffixAutomaton::iterator::operator++() {
   return prev;
 }
 
-size_t& SuffixAutomaton::iterator::operator*() {
+size_t &SuffixAutomaton::iterator::operator*() {
   return id_;
 }
 
-size_t* SuffixAutomaton::iterator::operator->() {
+size_t *SuffixAutomaton::iterator::operator->() {
   return &id_;
 }
 
-bool SuffixAutomaton::iterator::operator ==(const iterator& other) {
+bool SuffixAutomaton::iterator::operator==(const iterator &other) {
   return id_ == other.id_;
 }
 
-bool SuffixAutomaton::iterator::operator !=(const iterator& other) {
+bool SuffixAutomaton::iterator::operator!=(const iterator &other) {
   return id_ != other.id_;
 }
 
@@ -373,14 +374,14 @@ std::unique_ptr<ProtoAutomaton> SuffixAutomaton::GetProtoAutomaton() const {
   proto_automaton->set_max_size(kMaxSize);
   proto_automaton->set_coef(kCoef);
   proto_automaton->set_stop_symbol(kStopSymbol);
-  auto* proto_nodes_pool = proto_automaton->mutable_nodes_pool();
+  auto *proto_nodes_pool = proto_automaton->mutable_nodes_pool();
   proto_nodes_pool->Reserve(nodes_pool_.size());
-  for (auto& node : nodes_pool_) {
+  for (auto &node : nodes_pool_) {
     //ownership transfer
     proto_nodes_pool->AddAllocated(node.GetProtoNode().release());
   }
   assert(proto_nodes_pool->size() == static_cast<int>(nodes_pool_.size()));
-  auto* proto_is_free_node = proto_automaton->mutable_is_free_node();
+  auto *proto_is_free_node = proto_automaton->mutable_is_free_node();
   proto_is_free_node->Reserve(is_free_node_.size());
   for (bool is_free : is_free_node_) {
     proto_is_free_node->AddAlreadyReserved(is_free);
@@ -389,7 +390,7 @@ std::unique_ptr<ProtoAutomaton> SuffixAutomaton::GetProtoAutomaton() const {
   return proto_automaton;
 }
 
-SuffixAutomaton::SuffixAutomaton(const ProtoAutomaton& proto_automaton)
+SuffixAutomaton::SuffixAutomaton(const ProtoAutomaton &proto_automaton)
     : amount_alive_nodes_(0) {
   last_node_ = proto_automaton.last_node();
   len_up_to_stop_symbol_ = proto_automaton.len_up_to_stop_symbol();
@@ -398,18 +399,18 @@ SuffixAutomaton::SuffixAutomaton(const ProtoAutomaton& proto_automaton)
   kCoef = proto_automaton.coef();
   kStopSymbol = proto_automaton.stop_symbol();
 
-  const auto& proto_is_free_node = proto_automaton.is_free_node();
+  const auto &proto_is_free_node = proto_automaton.is_free_node();
   is_free_node_.resize(proto_automaton.is_free_node_size());
-  const auto& proto_nodes_pool = proto_automaton.nodes_pool();
+  const auto &proto_nodes_pool = proto_automaton.nodes_pool();
   nodes_pool_.reserve(proto_automaton.nodes_pool_size());
   assert(proto_automaton.is_free_node_size() == proto_automaton.nodes_pool_size());
 
   nodes_pool_.emplace_back(proto_nodes_pool.Get(0)); // zero node
 
   for (size_t i_node = 1; i_node < is_free_node_.size(); ++i_node) {
-    const auto& proto_node = proto_nodes_pool.Get(i_node);
+    const auto &proto_node = proto_nodes_pool.Get(i_node);
     nodes_pool_.emplace_back(proto_node);
-    const Node& current_node = nodes_pool_.back();
+    const Node &current_node = nodes_pool_.back();
     if (proto_is_free_node.Get(i_node)) {
       is_free_node_[i_node] = true;
       free_nodes_.push_back(i_node);

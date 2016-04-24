@@ -1,4 +1,6 @@
 package singe
+// Copyright 2014 Vladimir Skipor <vladimirskipor@gmail.com>
+// Released under the MIT license
 
 /*
 #cgo LDFLAGS: -ldictgen_c

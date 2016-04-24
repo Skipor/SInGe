@@ -16,7 +16,7 @@
 #include "automaton.pb.h"
 
 class Node {
-public:
+ public:
   Node();
 
   ~Node();
@@ -48,25 +48,25 @@ public:
   size_t InDegree() const;
 
   size_t OutDegree() const;
-  
+
   bool DeleteEdge(size_t to);
 
   bool DeleteRevEdge(size_t from);
 
   bool DeleteRevLink(size_t from);
 
-  std::unique_ptr<ProtoNode> GetProtoNode() const ;
+  std::unique_ptr<ProtoNode> GetProtoNode() const;
 
-  explicit Node(const ProtoNode& proto_node);
+  explicit Node(const ProtoNode &proto_node);
 
   size_t link;
   size_t len_actual;
   size_t len_within_document;
-  size_t docs_occurs_in;		
+  size_t docs_occurs_in;
   double score_occurs_only;
   size_t last_hash;
-    
-private:
+
+ private:
   std::vector<std::pair<char, size_t> > edges_;
   std::vector<std::pair<char, size_t> > rev_edges_;
   std::vector<size_t> rev_links_;

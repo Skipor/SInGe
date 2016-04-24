@@ -6,18 +6,18 @@
 #include "dictionary.hpp"
 
 class IncrementalTester {
-public:
+ public:
 
-  IncrementalTester(const char * folder);
+  IncrementalTester(const char *folder);
 
   void Run(size_t documents, size_t dict_margin, bool vs_empty_dict);
 
-private:
+ private:
 
-  bool ProcessFile(const std::string& path, size_t documents, size_t dict_margin, bool vs_empty_dict);
+  bool ProcessFile(const std::string &path, size_t documents, size_t dict_margin, bool vs_empty_dict);
 
   Dictionary dictionary;
-  const char * folder;
+  const char *folder;
   size_t seen_files;
   double sum_score;
   double sum_score_vs_empty_dict;

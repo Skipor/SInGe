@@ -1,3 +1,5 @@
+// Copyright 2014 Vladimir Skipor <vladimirskipor@gmail.com>
+// Released under the MIT license
 #include <gtest/gtest.h>
 #include <vector>
 #include <cstdlib>
@@ -6,15 +8,15 @@
 
 #include "suffix_automaton.hpp"
 
-class SerializationTest : public testing::Test {
-protected:
+class SerializationTest: public testing::Test {
+ protected:
   virtual void SetUp() {
   }
 
   void NodeEqualsTest(
-      const Node& first_node,
-      const Node& second_node,
-      const std::string& msg) {
+      const Node &first_node,
+      const Node &second_node,
+      const std::string &msg) {
     EXPECT_EQ(first_node.link, second_node.link) << msg;
     EXPECT_EQ(first_node.len_actual, second_node.len_actual) << msg;
     EXPECT_EQ(first_node.len_within_document, second_node.len_within_document) << msg;
@@ -27,9 +29,9 @@ protected:
   }
 
   void AutomatonEqualsTest(
-      const SuffixAutomaton& first_automaton,
-      const SuffixAutomaton& second_automaton,
-      const std::string& msg) {
+      const SuffixAutomaton &first_automaton,
+      const SuffixAutomaton &second_automaton,
+      const std::string &msg) {
     ASSERT_EQ(first_automaton.nodes_pool_.size(), second_automaton.nodes_pool_.size()) << msg;
     for (size_t i_node = 0; i_node < first_automaton.nodes_pool_.size(); ++i_node) {
       NodeEqualsTest(first_automaton.nodes_pool_[i_node], second_automaton.nodes_pool_[i_node], msg);
@@ -46,7 +48,7 @@ protected:
     EXPECT_EQ(first_automaton.kStopSymbol, second_automaton.kStopSymbol) << msg;
   }
 
-  SuffixAutomaton SerializeAndDeserialize(const SuffixAutomaton& automaton) {
+  SuffixAutomaton SerializeAndDeserialize(const SuffixAutomaton &automaton) {
     auto proto_automaton_ptr = automaton.GetProtoAutomaton();
     std::ostringstream output_stream;
     EXPECT_TRUE(proto_automaton_ptr->IsInitialized());
@@ -57,19 +59,21 @@ protected:
     return SuffixAutomaton(output_proto_automaton);
   }
 
-  Node SerializeAndDeserialize(const Node& node) {
+  Node SerializeAndDeserialize(const Node &node) {
     auto proto_node_ptr = node.GetProtoNode();
     ProtoNode output_proto_node;
     output_proto_node.ParseFromString(proto_node_ptr->SerializeAsString());
     return Node(output_proto_node);
   }
 
-  void AutomatonSerializationTest(const SuffixAutomaton& automaton) {
-    AutomatonEqualsTest(automaton, SuffixAutomaton(*(automaton.GetProtoAutomaton())), "automaton construct, deconstruct test");
+  void AutomatonSerializationTest(const SuffixAutomaton &automaton) {
+    AutomatonEqualsTest(automaton,
+                        SuffixAutomaton(*(automaton.GetProtoAutomaton())),
+                        "automaton construct, deconstruct test");
     AutomatonEqualsTest(automaton, SerializeAndDeserialize(automaton), "automaton Serialize and Deserialize test");
   }
 
-  void NodeSerializationTest(const Node& node) {
+  void NodeSerializationTest(const Node &node) {
     NodeEqualsTest(node, Node(*(node.GetProtoNode())), "node construct, deconstruct test");
     NodeEqualsTest(node, SerializeAndDeserialize(node), "node Serialize and Deserialize test");
   }
@@ -112,9 +116,9 @@ TEST_F(SerializationTest, DefaultConstructorTest) {
 }
 
 TEST_F(SerializationTest, AutomatonTest) {
-  const char* str1 = "aaaabacaaabaca";
-  const char* str2 = "xxxyyywwwwwwwwxxyyyw";
-  const char* str3 = "l;kjasdalskdjfl  qojlsakj oit\n \n asl;fjlasjdfl;l;lkl;k354566325734 1```431@\n#$%^&*()";
+  const char *str1 = "aaaabacaaabaca";
+  const char *str2 = "xxxyyywwwwwwwwxxyyyw";
+  const char *str3 = "l;kjasdalskdjfl  qojlsakj oit\n \n asl;fjlasjdfl;l;lkl;k354566325734 1```431@\n#$%^&*()";
   SuffixAutomaton automaton;
   automaton.AddString(str1, strlen(str1));
   automaton.AddString(str2, strlen(str2));

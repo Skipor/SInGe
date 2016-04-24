@@ -5,9 +5,9 @@
 
 #include "suffix_automaton.hpp"
 
-class SuffixAutomatonTest : public testing::Test {
+class SuffixAutomatonTest: public testing::Test {
  protected:
-  virtual void SetUp() {}
+  virtual void SetUp() { }
 
   void NodeEqualsTest(Node correct_node, Node aut_node, std::string msg) {
     ASSERT_EQ(correct_node.link, aut_node.link) << msg;
@@ -28,7 +28,7 @@ TEST_F(SuffixAutomatonTest, StructureTest) {
 
   // node[0]
   ASSERT_EQ(automaton.GetNode(0), nullptr);
-  
+
   // node[1]
   Node node1;
   node1.link = 0;
@@ -42,7 +42,7 @@ TEST_F(SuffixAutomatonTest, StructureTest) {
   // node[2]
   Node node2;
   node2.link = 1;
-  node2.AddEdge('b', 3); 
+  node2.AddEdge('b', 3);
   node2.AddEdge('c', 5);
   node2.len_actual = node2.len_within_document = 1;
   ASSERT_NE(automaton.GetNode(2), nullptr);
@@ -113,9 +113,12 @@ TEST_F(SuffixAutomatonTest, AddingViaStopSymbolTest) {
   automaton.AddStringViaStopSymbol("qw", 2);
   automaton.AddString("erty", 4);
 
-  ASSERT_EQ(correct_automaton.AmountNodes(), automaton.AmountNodes()) << " comparing \"abacaba[stop]qwerty\" vs \"abacaba[stop]qw+erty";
+  ASSERT_EQ(correct_automaton.AmountNodes(), automaton.AmountNodes())
+                << " comparing \"abacaba[stop]qwerty\" vs \"abacaba[stop]qw+erty";
   for (size_t id = 1; id < automaton.AmountNodes(); ++id) {
-    NodeEqualsTest(*correct_automaton.GetNode(id), *automaton.GetNode(id), " comparing \"abacaba[stop]qwerty\" vs \"abacaba[stop]qw+erty, node id = " + std::to_string(id));
+    NodeEqualsTest(*correct_automaton.GetNode(id),
+                   *automaton.GetNode(id),
+                   " comparing \"abacaba[stop]qwerty\" vs \"abacaba[stop]qw+erty, node id = " + std::to_string(id));
   }
 }
 

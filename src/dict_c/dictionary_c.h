@@ -12,11 +12,11 @@
 extern "C" {
 #endif
 
-typedef void* SInGe;
+typedef void *SInGe;
 
 struct SInGeDict {
-    const char * data;
-    const size_t length;
+  const char *data;
+  const size_t length;
 };
 
 SInGe SInGeInit(
@@ -30,12 +30,11 @@ SInGe SInGeInit(
 
 void SInGeFree(SInGe gen);
 
-void SInGeAddDocument(SInGe gen, const char* doc, size_t length);
+void SInGeAddDocument(SInGe gen, const char *doc, size_t length);
 
-void SInGeAddDocumentViaStopSymbol(SInGe gen, const char* doc, size_t length);
+void SInGeAddDocumentViaStopSymbol(SInGe gen, const char *doc, size_t length);
 
 struct SInGeDict SInGeGetDict(SInGe gen);
-
 
 
 #ifdef __cplusplus

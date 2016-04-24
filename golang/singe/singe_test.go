@@ -1,4 +1,6 @@
 package singe_test
+// Copyright 2014 Vladimir Skipor <vladimirskipor@gmail.com>
+// Released under the MIT license
 
 import (
 	"github.com/cscenter/SInGe/golang/singe"

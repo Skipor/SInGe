@@ -2,6 +2,7 @@
 * simple-SDCH-gen
 *
 * Copyright 2014 Pavel Savchenkov <pavelsavchenkow@gmail.com>
+* Copyright 2014 Vladimir Skipor <vladimirskipor@gmail.com>
 * Released under the MIT license
 */
 
@@ -20,7 +21,8 @@
 #include "node.hpp"
 
 struct compare_nodes {
-  bool operator() (const std::pair<std::pair<double, size_t>, size_t>& node1, const std::pair<std::pair<double, size_t>, size_t>& node2) {
+  bool operator()(const std::pair<std::pair<double, size_t>, size_t> &node1,
+                  const std::pair<std::pair<double, size_t>, size_t> &node2) {
     double occurs1 = node1.first.first;
     double occurs2 = node2.first.first;
     size_t len1 = node1.first.second;
@@ -28,12 +30,12 @@ struct compare_nodes {
     size_t id1 = node1.second;
     size_t id2 = node2.second;
 
-    if  (fabs(occurs1 - occurs2) > 1e-9) {
+    if (fabs(occurs1 - occurs2) > 1e-9) {
       return occurs2 > occurs1;
     }
 
-    if  (len1 != len2) {
-      return len2 < len1; 
+    if (len1 != len2) {
+      return len2 < len1;
     }
 
     return id1 > id2;
@@ -41,11 +43,14 @@ struct compare_nodes {
 };
 
 class SuffixAutomaton {
-public:
+ public:
   // const in the past
-  size_t kMaxSize; // size limit. If size of automaton becomes bigger, low scored nodes will cut off.
-  char kStopSymbol; // symbol inserted between documents, if they are added via stop symbol
-  double kCoef; // when lower than 1, new documents became more important. Using for incremental updating, to balance low scored substring cut. should be 1 normally
+  // size limit. If size of automaton becomes bigger, low scored nodes will cut off.
+  size_t kMaxSize;
+  // symbol inserted between documents, if they are added via stop symbol
+  char kStopSymbol;
+  // when lower than 1, new documents became more important. Using for incremental updating, to balance low scored substring cut. should be 1 normally
+  double kCoef; //TODO make non incremental veirsion
 
   class iterator;
 
@@ -63,19 +68,19 @@ public:
 
   size_t AmountAliveNodes() const;
 
-  inline size_t GetIdNode(Node* node) const {
+  inline size_t GetIdNode(Node *node) const {
     return node - nodes_pool_.data();
   }
 
-  inline size_t GetIdNode(Node* node) {
+  inline size_t GetIdNode(Node *node) {
     return node - nodes_pool_.data();
   }
 
-  inline const Node* GetNode(size_t id) const {
+  inline const Node *GetNode(size_t id) const {
     return id && !is_free_node_[id] && id < nodes_pool_.size() ? &nodes_pool_[id] : nullptr;
   }
 
-  inline Node* GetNode(size_t id) {
+  inline Node *GetNode(size_t id) {
     return id && !is_free_node_[id] && id < nodes_pool_.size() ? &nodes_pool_[id] : nullptr;
   }
 
@@ -83,9 +88,9 @@ public:
 
   bool AddOccurence(size_t id);
 
-  void AddString(const char* const str, size_t length);
-    
-  void AddStringViaStopSymbol(const char* const str, size_t length);
+  void AddString(const char *const str, size_t length);
+
+  void AddStringViaStopSymbol(const char *const str, size_t length);
 
   size_t root() const;
 
@@ -101,9 +106,9 @@ public:
 
   std::unique_ptr<ProtoAutomaton> GetProtoAutomaton() const;
 
-  explicit SuffixAutomaton(const ProtoAutomaton& proto_automaton);
+  explicit SuffixAutomaton(const ProtoAutomaton &proto_automaton);
 
-private:
+ private:
   size_t NewNode();
 
   bool AddLink(size_t from, size_t to);
@@ -134,22 +139,22 @@ private:
 
 
 class SuffixAutomaton::iterator {
-public:
-  iterator(size_t id, std::vector<bool>& is_free_node);
+ public:
+  iterator(size_t id, std::vector<bool> &is_free_node);
 
   iterator operator++();
 
-  size_t& operator*();
+  size_t &operator*();
 
-  size_t* operator->();
+  size_t *operator->();
 
-  bool operator ==(const iterator& other);
+  bool operator==(const iterator &other);
 
-  bool operator !=(const iterator& other);
+  bool operator!=(const iterator &other);
 
-private:
+ private:
   size_t id_;
-  std::vector<bool>& is_free_node_;
+  std::vector<bool> &is_free_node_;
 };
 
 #endif // SUFFIX_AUTOMATON_HPP_
