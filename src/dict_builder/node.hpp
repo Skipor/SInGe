@@ -21,9 +21,9 @@ class Node {
 
   ~Node();
 
-  bool HasEdgeThrough(char ch) const;
+  bool HasEdge(char ch) const;
 
-  size_t NextNodeThrough(char ch) const;
+  size_t Next(char ch) const;
 
   std::vector<std::pair<char, size_t> >::iterator edges_begin();
 
@@ -59,9 +59,9 @@ class Node {
 
   explicit Node(const ProtoNode &proto_node);
 
-  size_t link;
-  size_t len_actual;
-  size_t len_within_document;
+  size_t link; //suffix link
+  size_t len_actual; // length of suffix of concatenated via stop symbol documents
+  size_t len_within_document; // length of suffix in one document
   size_t docs_occurs_in;
   double score_occurs_only;
   size_t last_hash;

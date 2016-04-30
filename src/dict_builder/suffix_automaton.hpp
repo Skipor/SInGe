@@ -92,7 +92,9 @@ class SuffixAutomaton {
 
   void AddStringViaStopSymbol(const char *const str, size_t length);
 
-  size_t root() const;
+  size_t root() const; //root node index
+
+  size_t fictitious() const; //fictitious node index
 
   bool Empty() const;
 
@@ -125,7 +127,7 @@ class SuffixAutomaton {
 
   void EraseFromNodesToDelete(size_t id);
 
-  std::vector<Node> nodes_pool_;
+  std::vector<Node> nodes_pool_; //fictitious node index is 0
   std::vector<size_t> free_nodes_;
   std::vector<bool> is_free_node_;
   size_t last_node_;

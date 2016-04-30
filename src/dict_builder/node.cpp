@@ -21,7 +21,7 @@ Node::Node()
 
 Node::~Node() { }
 
-bool Node::HasEdgeThrough(char ch) const {
+bool Node::HasEdge(char ch) const {
   for (const auto &edge : edges_) {
     if (edge.first == ch) {
       return true;
@@ -30,7 +30,7 @@ bool Node::HasEdgeThrough(char ch) const {
   return false;
 }
 
-size_t Node::NextNodeThrough(char ch) const {
+size_t Node::Next(char ch) const {
   for (const auto &edge : edges_) {
     if (edge.first == ch) {
       return edge.second;

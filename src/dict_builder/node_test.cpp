@@ -21,8 +21,8 @@ class NodeTest: public testing::Test {
       char c = edge.first;
       size_t to = edge.second;
 
-      ASSERT_TRUE(node.HasEdgeThrough(c));
-      ASSERT_EQ(node.NextNodeThrough(c), to);
+      ASSERT_TRUE(node.HasEdge(c));
+      ASSERT_EQ(node.Next(c), to);
     }
   }
 

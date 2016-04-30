@@ -154,7 +154,7 @@ void Dictionary::ResetLastDocument() {
   size_t id = automaton_all_.root();
   size_t pos = 0;
   while (pos < last_document_.size()) {
-    id = GetNode(id)->NextNodeThrough(last_document_[pos]);
+    id = GetNode(id)->Next(last_document_[pos]);
     ++pos;
 
     size_t cur_id = id;

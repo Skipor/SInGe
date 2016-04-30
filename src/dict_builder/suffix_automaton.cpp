@@ -117,6 +117,10 @@ size_t SuffixAutomaton::root() const {
   return 1;
 }
 
+size_t SuffixAutomaton::fictitious() const {
+  return 0;
+}
+
 bool SuffixAutomaton::Empty() const {
   return last_node_ == root();
 }
@@ -295,16 +299,16 @@ void SuffixAutomaton::AddCharacter(char ch) {
 
   size_t prev = last_node_;
   last_node_ = new_node;
-  for (; prev && !GetNode(prev)->HasEdgeThrough(ch); prev = GetNode(prev)->link) {
+  for (; prev != fictitious() && !GetNode(prev)->HasEdge(ch); prev = GetNode(prev)->link) {
     AddEdge(prev, new_node, ch);
   }
 
-  if (!prev) {
+  if (prev == fictitious()) {
     AddLink(new_node, root());
     return;
   }
 
-  size_t next = GetNode(prev)->NextNodeThrough(ch);
+  size_t next = GetNode(prev)->Next(ch);
   if (GetNode(next)->len_actual == GetNode(prev)->len_actual + 1) {
     AddLink(new_node, next);
     return;
@@ -321,7 +325,7 @@ void SuffixAutomaton::AddCharacter(char ch) {
     AddEdge(middle, it->second, it->first);
   }
 
-  for (; prev && GetNode(prev)->NextNodeThrough(ch) == next; prev = GetNode(prev)->link) {
+  for (; prev != fictitious() && GetNode(prev)->Next(ch) == next; prev = GetNode(prev)->link) {
     DeleteEdge(prev, next);
     AddEdge(prev, middle, ch);
   }
@@ -368,21 +372,21 @@ bool SuffixAutomaton::iterator::operator!=(const iterator &other) {
 std::unique_ptr<ProtoAutomaton> SuffixAutomaton::GetProtoAutomaton() const {
   assert(is_free_node_.size() == nodes_pool_.size());
   auto proto_automaton = std::unique_ptr<ProtoAutomaton>(new ProtoAutomaton());
-  proto_automaton->set_last_node(last_node_);
-  proto_automaton->set_len_up_to_stop_symbol(len_up_to_stop_symbol_);
+  proto_automaton->set_last_node((google::protobuf::int64) last_node_);
+  proto_automaton->set_len_up_to_stop_symbol((google::protobuf::int64) len_up_to_stop_symbol_);
   proto_automaton->set_current_coef(current_coef);
   proto_automaton->set_max_size(kMaxSize);
   proto_automaton->set_coef(kCoef);
   proto_automaton->set_stop_symbol(kStopSymbol);
   auto *proto_nodes_pool = proto_automaton->mutable_nodes_pool();
-  proto_nodes_pool->Reserve(nodes_pool_.size());
+  proto_nodes_pool->Reserve((int) nodes_pool_.size());
   for (auto &node : nodes_pool_) {
     //ownership transfer
     proto_nodes_pool->AddAllocated(node.GetProtoNode().release());
   }
   assert(proto_nodes_pool->size() == static_cast<int>(nodes_pool_.size()));
   auto *proto_is_free_node = proto_automaton->mutable_is_free_node();
-  proto_is_free_node->Reserve(is_free_node_.size());
+  proto_is_free_node->Reserve((int) is_free_node_.size());
   for (bool is_free : is_free_node_) {
     proto_is_free_node->AddAlreadyReserved(is_free);
   }
@@ -392,26 +396,26 @@ std::unique_ptr<ProtoAutomaton> SuffixAutomaton::GetProtoAutomaton() const {
 
 SuffixAutomaton::SuffixAutomaton(const ProtoAutomaton &proto_automaton)
     : amount_alive_nodes_(0) {
-  last_node_ = proto_automaton.last_node();
-  len_up_to_stop_symbol_ = proto_automaton.len_up_to_stop_symbol();
+  last_node_ = (size_t) proto_automaton.last_node();
+  len_up_to_stop_symbol_ = (size_t) proto_automaton.len_up_to_stop_symbol();
   current_coef = proto_automaton.current_coef();
   kMaxSize = proto_automaton.max_size();
   kCoef = proto_automaton.coef();
-  kStopSymbol = proto_automaton.stop_symbol();
+  kStopSymbol = (char) proto_automaton.stop_symbol();
 
   const auto &proto_is_free_node = proto_automaton.is_free_node();
-  is_free_node_.resize(proto_automaton.is_free_node_size());
+  is_free_node_.resize((unsigned long) proto_automaton.is_free_node_size());
   const auto &proto_nodes_pool = proto_automaton.nodes_pool();
-  nodes_pool_.reserve(proto_automaton.nodes_pool_size());
+  nodes_pool_.reserve((unsigned long) proto_automaton.nodes_pool_size());
   assert(proto_automaton.is_free_node_size() == proto_automaton.nodes_pool_size());
 
   nodes_pool_.emplace_back(proto_nodes_pool.Get(0)); // zero node
 
-  for (size_t i_node = 1; i_node < is_free_node_.size(); ++i_node) {
-    const auto &proto_node = proto_nodes_pool.Get(i_node);
+  for (size_t i_node = root(); i_node < is_free_node_.size(); ++i_node) {
+    const auto &proto_node = proto_nodes_pool.Get((int) i_node);
     nodes_pool_.emplace_back(proto_node);
     const Node &current_node = nodes_pool_.back();
-    if (proto_is_free_node.Get(i_node)) {
+    if (proto_is_free_node.Get((int) i_node)) {
       is_free_node_[i_node] = true;
       free_nodes_.push_back(i_node);
     } else {
